@@ -105,6 +105,13 @@ __host__ __device__ void warp_activation(Activation activation, const fragment_t
 				result.x[t] = (T)(logf(expf((float)frag.x[t] * K_ACT) + 1.0f) / K_ACT);
 			}
 			return;
+		case Activation::Gaussian:
+			TCNN_PRAGMA_UNROLL
+			for (int t=0; t < result.num_elements; t++) {
+				float x = (float) frag.x[t];
+				result.x[t] = (T)(expf( -0.5f * (x * x) ));
+			}
+			return;
 		case Activation::None: result = frag; return;
 		default:
 			// Unsupported activation
@@ -163,6 +170,13 @@ __host__ __device__ void warp_activation_backward_in(Activation activation, cons
 				result.x[t] = frag.x[t] * (T)(tmp / (tmp + 1));
 			}
 			return;
+		case Activation::Gaussian:
+			TCNN_PRAGMA_UNROLL
+			for (int t=0; t < result.num_elements; t++) {
+				float x = (float) forward_frag_in.x[t];
+				result.x[t] = frag.x[t] * (T)( -x *  fmaxf(expf(-0.5f * (x * x)), 1e-6) );
+			}
+			return;
 		case Activation::None: result = frag; return;
 		default:
 			// Unsupported activation
@@ -216,6 +230,13 @@ __host__ __device__ void warp_activation_backward(Activation activation, const f
 			for (int t=0; t < result.num_elements; t++) {
 				result.x[t] = frag.x[t] * (T)(1.0f - expf(-(float)forward_frag.x[t] * K_ACT));
 			}
+			return;
+		case Activation::Gaussian:
+			//TCNN_PRAGMA_UNROLL
+			// for (int t=0; t < result.num_elements; t++) {
+			// 	float tmp = (float) forward_frag.x[t];
+			// 	result.x[t] = frag.x[t] * (T) (-x * tmp);
+			// }
 			return;
 		case Activation::None: result = frag; return;
 		default:

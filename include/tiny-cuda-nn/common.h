@@ -79,6 +79,7 @@ enum class Activation {
 	Sigmoid,
 	Squareplus,
 	Softplus,
+	Gaussian,
 	None,
 };
 

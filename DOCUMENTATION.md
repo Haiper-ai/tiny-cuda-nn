@@ -23,6 +23,7 @@ The following activation functions are supported:
 - `"Sigmoid"` (the logistic function)
 - `"Squareplus"` (defined as `0.5 * (x + sqrt(x*x + 4))`)
 - `"Softplus"` (defined as `log(exp(x) + 1)`)
+- `"Gaussian"` (defined as `exp(-0.5*x^2)`)
 
 
 ### Fully Fused MLP
